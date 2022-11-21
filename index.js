@@ -51,8 +51,7 @@ async function run() {
     app.post('/user/:email', async (req, res) => {
       const email = req.params.email;
 
-      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1h' })
-      console.log(token)
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '24h' })
       res.send(token);
     })
 
@@ -66,7 +65,7 @@ async function run() {
     })
 
     // Add Blog Post
-    app.post('/add-blog', async (req, res) => {
+    app.post('/add-blog', verifyJWT, async (req, res) => {
       const blog = req.body;
       await blogCollection.insertOne(blog);
       res.send({ success: true, message: 'Post Create Successfully!' })
@@ -78,8 +77,14 @@ async function run() {
       res.send(result);
     })
 
+    // Get All Blogs
+    app.get('/allblogs', async (req, res) => {
+      const result = await blogCollection.find().toArray();
+      res.send(result);
+    })
+
     // Delete Single Blog.
-    app.delete('/blog/:id', async (req, res) => {
+    app.delete('/blog/:id', verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const reault = await blogCollection.deleteOne(query);
