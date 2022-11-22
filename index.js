@@ -83,6 +83,14 @@ async function run() {
       res.send(result);
     })
 
+    // Get Single Blog.
+    app.get('/blog/:slug', async (req, res) => {
+      const slug = req.params.slug;
+      const query = { slug: slug };
+      const blog = await blogCollection.findOne(query);
+      res.send(blog);
+    })
+
     // Delete Single Blog.
     app.delete('/blog/:id', verifyJWT, async (req, res) => {
       const id = req.params.id;
@@ -92,13 +100,14 @@ async function run() {
     })
 
 
-    app.get('/project/:id', verifyJWT, async (req, res) => {
+    app.get('/project/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const project = await projectCollection.findOne(query);
       res.send(project);
     })
   }
+
   finally {
     // await client.close();
   }
